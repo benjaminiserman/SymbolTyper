@@ -1,7 +1,8 @@
 ﻿namespace SymbolTyper;
 
+using System;
 using System.Collections.Generic;
-using Iksokodo;
+using System.Linq;
 using WingSharpExtensions;
 
 public class DeterministicFiniteStateMachine<T>
@@ -21,20 +22,72 @@ public class DeterministicFiniteStateMachine<T>
 			else
 			{
 				var t = value[i];
-				return Transitions[t].TryAccept(value, i + 1);
+				if (Transitions.TryGetValue(t, out var state))
+				{
+					return state.TryAccept(value, i + 1);
+				}
+				else
+				{
+					return false;
+				}
 			}
+		}
+
+		public bool Consume(T symbol, State startState, ref State currentState)
+		{
+			if (Transitions.TryGetValue(symbol, out var state))
+			{
+				currentState = state;
+			}
+			else
+			{
+				currentState = startState;
+			}
+
+			return currentState.Accepting;
 		}
 	}
 
 	private readonly List<State> _states = new();
 	private State _startState;
+	private State _currentState;
+
+	public bool StartStateIsAccepting => _startState.Accepting;
+	public bool CurrentStateIsAccepting => _currentState.Accepting;
+
+	public string LogString() => string.Join("\n", _states.Select(s => $"{s.Key.GetHashCode()} | {string.Join(", ", s.Key)}: {string.Join(", ", s.Transitions.Values.Select(s => s.Key.GetHashCode()))}"));
+
+	public bool Process(T symbol, out List<T> key)
+	{
+		_currentState.Consume(symbol, _startState, ref _currentState);
+		key = _currentState.Key;
+
+		//Console.WriteLine($"{symbol} => {{ {string.Join(", ", key)} }}, {key.GetHashCode()}");
+
+		return _currentState.Accepting;
+	}
+
+	public IEnumerable<T> NextStates()
+	{
+		foreach (var transition in _currentState.Transitions.Keys)
+		{
+			yield return transition;
+		}
+	}
+
+	public bool ReturnToStart()
+	{
+		_currentState = _startState;
+		return _currentState.Accepting;
+	}
 
 	public bool TryAccept(IList<T> value) => _startState.TryAccept(value, 0);
 
-	public static DeterministicFiniteStateMachine<char> GetDfsmFromStrings(IEnumerable<string> values) => DeterministicFiniteStateMachine<char>.GetDfsmFromSequence(values
-		.Select(s => s
-			.Select(c => c)
-			.ToList()));
+	public static DeterministicFiniteStateMachine<char> GetDfsmFromStrings(IEnumerable<string> values) => DeterministicFiniteStateMachine<char>
+		.GetDfsmFromSequence(values
+			.Select(s => s
+				.Select(c => c)
+				.ToList()));
 	public static DeterministicFiniteStateMachine<T> GetDfsmFromSequence(IEnumerable<IList<T>> values)
 	{
 		var dfsm = new DeterministicFiniteStateMachine<T>();
@@ -44,7 +97,7 @@ public class DeterministicFiniteStateMachine<T>
 			var tempDict = new LazyDictionary<T, List<IList<T>>>()
 			{
 				AddMissingKeys = true,
-				GetDefault = () => new()
+				GetDefault = _ => new()
 			};
 
 			var shouldAccept = false;
@@ -71,27 +124,16 @@ public class DeterministicFiniteStateMachine<T>
 
 			foreach (var (key, list) in tempDict)
 			{
-				if (list.Count == 1)
-				{
-					state.Transitions.Add(key, new()
-					{
-						Accepting = true,
-						Key = list
-							.First()
-							.ToList()
-					});
-				}
-				else
-				{
-					state.Transitions.Add(key, GetStates(list, i + 1));
-				}
+				state.Transitions.Add(key, GetStates(list, i + 1));
 			}
 
+			//Console.WriteLine($"{i}: {string.Join(", ", state.Key)}");
 			dfsm._states.Add(state);
 			return state;
 		}
 
 		dfsm._startState = GetStates(values, 0);
+		dfsm._currentState = dfsm._startState;
 		return dfsm;
 	}
 }

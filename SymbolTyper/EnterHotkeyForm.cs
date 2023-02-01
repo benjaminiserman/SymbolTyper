@@ -1,4 +1,5 @@
-﻿namespace Iksokodo;
+﻿namespace SymbolTyper;
+
 using System;
 using System.Windows.Forms;
 

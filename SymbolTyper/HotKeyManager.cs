@@ -1,6 +1,8 @@
-﻿namespace Iksokodo;
+﻿namespace SymbolTyper;
+
 using System;
 using WK.Libraries.HotkeyListenerNS;
+using System.Windows.Forms;
 
 internal static class HotkeyManager
 {

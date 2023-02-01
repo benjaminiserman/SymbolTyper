@@ -1,4 +1,6 @@
-﻿namespace Iksokodo;
+﻿namespace SymbolTyper;
+
+using System.Windows.Forms;
 
 partial class EnterHotkeyForm : Form
 {

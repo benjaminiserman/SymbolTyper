@@ -1,7 +1,10 @@
-﻿namespace Iksokodo;
+﻿namespace SymbolTyper;
+
 using System;
+using System.IO;
 using System.Windows.Forms;
 using System.Text.Json;
+using System.Runtime.InteropServices;
 
 internal static class Program
 {
@@ -20,7 +23,11 @@ internal static class Program
 		}
 		else
 		{
-			Config = JsonSerializer.Deserialize<Config>(File.ReadAllText(CONFIG_PATH));
+			Config = JsonSerializer.Deserialize<Config>(File.ReadAllText(CONFIG_PATH), new JsonSerializerOptions()
+			{
+				ReadCommentHandling = JsonCommentHandling.Skip,
+				AllowTrailingCommas = true,
+			});
 		}
 
 		SystemTrayProcess taskBarProcess = new(Config);
@@ -30,5 +37,8 @@ internal static class Program
 		Application.Run(taskBarProcess);
 	}
 
-	public static void SaveConfig() => File.WriteAllText(CONFIG_PATH, JsonSerializer.Serialize(Config));
+	public static void SaveConfig() => File.WriteAllText(CONFIG_PATH, JsonSerializer.Serialize(Config, new JsonSerializerOptions()
+	{
+		WriteIndented = true,
+	}));
 }

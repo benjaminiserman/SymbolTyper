@@ -1,18 +1,19 @@
-﻿namespace Iksokodo;
+﻿namespace SymbolTyper;
+
 using System;
+using System.Drawing;
 using System.Windows.Forms;
-using SymbolTyper;
 using Timer = System.Timers.Timer;
 
 internal class SystemTrayProcess : ApplicationContext
 {
-	private static readonly Icon _normal = new("iksokodo.ico");
-	private static readonly Icon _suspended = new("iksokodo_suspend.ico");
+	private static readonly Icon _normal = new("symboltyper.ico");
+	private static readonly Icon _suspended = new("symboltyper_suspend.ico");
 
 	private readonly NotifyIcon _trayIcon;
 	private readonly ToolStripMenuItem _toggleButton, _changeHotkeyButton, _exitButton;
 
-	private readonly Converter _converter;
+	private readonly KeyStrokeConverter _converter;
 	private readonly Timer _timer;
 
 	private const string PAUSE_MESSAGE = "Pause";
@@ -50,20 +51,17 @@ internal class SystemTrayProcess : ApplicationContext
 		menuStrip.Items.Add(_changeHotkeyButton);
 		menuStrip.Items.Add(_exitButton);
 
-		_trayIcon = new()
-		{
-			Visible = true,
-			Icon = _normal,
-			Text = "Iksokodo",
-			ContextMenuStrip = menuStrip,
-		};
+		//_trayIcon = new()
+		//{
+		//	Visible = true,
+		//	Icon = _normal,
+		//	Text = "SymbolTyper",
+		//	ContextMenuStrip = menuStrip,
+		//};
 
-		_trayIcon.MouseClick += TrayRightClick;
+		//_trayIcon.MouseClick += TrayRightClick;
 
-		_converter = new()
-		{
-			StateMachine = DeterministicFiniteStateMachine<char>.GetDfsmFromStrings(config.Replacements.Values)
-		};
+		_converter = new(config);
 
 		HotkeyManager.RegisterHotkey(ToggleLoop);
 

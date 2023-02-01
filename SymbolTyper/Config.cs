@@ -1,4 +1,7 @@
-﻿namespace Iksokodo;
+﻿namespace SymbolTyper;
+
+using System.Collections.Generic;
+using System.Windows.Forms;
 using WK.Libraries.HotkeyListenerNS;
 
 internal record Config
