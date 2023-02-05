@@ -382,6 +382,7 @@
         "\\nul": "␀",
         "\\_": "␣",
         "\\shamrock": "☘",
+        "\\ref": "※",
 
         // tv controls
         "\\reverse": "⏮",
