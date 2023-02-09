@@ -7,7 +7,7 @@ using WingSharpExtensions;
 
 public class DeterministicFiniteStateMachine<T>
 {
-	private class State
+	public class State
 	{
 		public Dictionary<T, State> Transitions { get; init; } = new();
 		public bool Accepting { get; init; } = false;
@@ -49,11 +49,16 @@ public class DeterministicFiniteStateMachine<T>
 	}
 
 	private readonly List<State> _states = new();
+	private readonly HashSet<State> _primaryStates = new();
 	private State _startState;
 	private State _currentState;
 
 	public bool StartStateIsAccepting => _startState.Accepting;
 	public bool CurrentStateIsAccepting => _currentState.Accepting;
+	public bool CurrentStateIsStart => _currentState == _startState;
+	public bool CurrentStateIsPrimary => _primaryStates.Contains(_currentState);
+
+	public State CurrentState { get => _currentState; set => _currentState = value; }
 
 	public string LogString() => string.Join("\n", _states.Select(s => $"{s.Key.GetHashCode()} | {string.Join(", ", s.Key)}: {string.Join(", ", s.Transitions.Values.Select(s => s.Key.GetHashCode()))}"));
 
@@ -134,6 +139,12 @@ public class DeterministicFiniteStateMachine<T>
 
 		dfsm._startState = GetStates(values, 0);
 		dfsm._currentState = dfsm._startState;
+		
+		foreach (var primaryState in dfsm._startState.Transitions.Values)
+		{
+			dfsm._primaryStates.Add(primaryState);
+		}
+
 		return dfsm;
 	}
 }

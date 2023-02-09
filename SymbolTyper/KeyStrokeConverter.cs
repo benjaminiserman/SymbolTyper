@@ -31,6 +31,7 @@ internal class KeyStrokeConverter
 
 	private DeterministicFiniteStateMachine<char> StateMachine { get; init; }
 	private List<char> _cachedMatch = null;
+	private Stack<DeterministicFiniteStateMachine<char>.State> PreviousStates { get; } = new();
 
 	public KeyStrokeConverter(Config config)
 	{
@@ -46,8 +47,6 @@ internal class KeyStrokeConverter
 
 		StateMachine = DeterministicFiniteStateMachine<char>.GetDfsmFromStrings(config.Replacements.Keys);
 		StringReplacements = config.Replacements;
-
-		//Console.WriteLine(StateMachine.LogString());
 	}
 
 	public void Convert()
@@ -59,12 +58,37 @@ internal class KeyStrokeConverter
 
 		if (TryGetKey(out var receivedKey))
 		{
-			if (receivedKey.KeyChar == '\0')
+			if (receivedKey.Keys == Keys.Back) // handle backspace
 			{
-				_cachedMatch = null;
-				StateMachine.ReturnToStart();
+				if (PreviousStates.Count > 1)
+				{
+					PreviousStates.Pop();
+					StateMachine.CurrentState = PreviousStates.Peek();
+					if (StateMachine.CurrentStateIsAccepting)
+					{
+						_cachedMatch = PreviousStates.Peek().Key;
+					}
+					else
+					{
+						_cachedMatch = null;
+					}
+				}
+				else
+				{
+					StateMachine.ReturnToStart();
+					_cachedMatch = null;
+				}
+
+				return;
 			}
-			else if (Key.IsStop(receivedKey.KeyChar) && _cachedMatch is not null)
+			else if (receivedKey.KeyChar == '\0') // handle control characters
+			{
+				StateMachine.ReturnToStart();
+				PreviousStates.Clear();
+				_cachedMatch = null;
+			}
+			else if (Key.IsStop(receivedKey.KeyChar) 
+				&& _cachedMatch != null) // handle stop characters
 			{
 				StateMachine.ReturnToStart();
 
@@ -73,11 +97,14 @@ internal class KeyStrokeConverter
 					_inputSimulator.Keyboard.KeyPress(VirtualKeyCode.BACK);
 				}
 
+				GetAsyncKeyState(Keys.Back);
+
 				_inputSimulator.Keyboard.TextEntry(StringReplacements[DfsmKeyToStringMap[_cachedMatch]]);
 
+				PreviousStates.Clear();
 				_cachedMatch = null;
 			}
-			else if (Process(receivedKey, out var matchedString))
+			else if (Process(receivedKey, out var matchedString)) // advance dfsm
 			{
 				_cachedMatch = matchedString;
 			}
@@ -85,6 +112,8 @@ internal class KeyStrokeConverter
 			{
 				_cachedMatch = null;
 			}
+
+			PreviousStates.Push(StateMachine.CurrentState);
 		}
 	}
 
@@ -130,9 +159,22 @@ internal class KeyStrokeConverter
 	{
 		var shiftKeyPressed = GetAsyncKeyState(Keys.ShiftKey) != 0;
 
+		if (GetAsyncKeyState(Keys.Back) == DOWN_AND_PRESSED_RECENTLY)
+		{
+			if (shiftKeyPressed)
+			{
+				gotKey = new(Keys.Escape, shiftKeyPressed);
+			}
+			else
+			{
+				gotKey = new(Keys.Back, shiftKeyPressed);
+			}
+
+			return true;
+		}
+
 		if (ControlKeys.AnyOut(key => GetAsyncKeyState(key) == DOWN_AND_PRESSED_RECENTLY, out var key))
 		{
-			Console.WriteLine(key.ToString());
 			gotKey = new(key, shiftKeyPressed);
 			return true;
 		}
