@@ -179,7 +179,7 @@ internal record struct Key(Keys Keys, bool Shift)
 	};
 
 	public static string PossibleCharactersWithoutShift => @"qwertyuiopasdfghjklzxcvbnm`1234567890-=[]\;',./ ";
-	public static string StopCharacters => @" ";
+	public static string StopCharacters => " ";
 	private static readonly HashSet<char> _stopCharacters = StopCharacters.ToHashSet();
 	public static bool IsStop(char c) => _stopCharacters.Contains(c);
 }
