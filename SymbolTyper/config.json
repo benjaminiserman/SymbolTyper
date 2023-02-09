@@ -421,6 +421,8 @@
 	"\\_": "␣",
 	"\\shamrock": "☘",
 	"\\ref": "※",
+	"\\check": "✓",
+	"\\x": "✗",
 
 	// tv controls
 	"\\reverse": "⏮",
