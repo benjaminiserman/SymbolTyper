@@ -173,6 +173,8 @@
 	"\\cup": "∪",
 	"\\cap": "∩",
 	"\\exists": "∃",
+	"\\not\\exists": "∄",
+	"\\nexists": "∄",
 	"\\forall": "∀",
 	"\\lor": "∨",
 	"\\land": "∧",
