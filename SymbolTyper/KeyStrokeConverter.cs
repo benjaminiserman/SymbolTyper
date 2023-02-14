@@ -151,6 +151,7 @@ internal class KeyStrokeConverter
 		Keys.Tab,
 		Keys.LWin,
 		Keys.RWin,
+		Keys.Return,
 	};
 
 	private const int DOWN_AND_PRESSED_RECENTLY = -32767; // -32767 == 0b10000000_00000001 => key is down and was pressed since last query
