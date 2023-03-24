@@ -210,6 +210,9 @@
 	"\\bottom": "⊥",
 	"\\end": "∎",
 	"\\compose": "∘",
+	"\\floor": "⌊⌋",
+	"\\ceil": "⌈⌉",
+	"\\round": "⌊⌉",
 
 	// programming ligatures
 	"\\<=": "≤",
