@@ -51,15 +51,15 @@ internal class SystemTrayProcess : ApplicationContext
 		menuStrip.Items.Add(_changeHotkeyButton);
 		menuStrip.Items.Add(_exitButton);
 
-		//_trayIcon = new()
-		//{
-		//	Visible = true,
-		//	Icon = _normal,
-		//	Text = "SymbolTyper",
-		//	ContextMenuStrip = menuStrip,
-		//};
+		_trayIcon = new()
+		{
+			Visible = true,
+			Icon = _normal,
+			Text = "SymbolTyper",
+			ContextMenuStrip = menuStrip,
+		};
 
-		//_trayIcon.MouseClick += TrayRightClick;
+		_trayIcon.MouseClick += TrayRightClick;
 
 		_converter = new(config);
 
@@ -96,6 +96,7 @@ internal class SystemTrayProcess : ApplicationContext
 
 		_trayIcon.Icon = wasPaused ? _normal : _suspended;
 
+		_converter.Reset();
 		_converter.Paused = !wasPaused;
 	}
 

@@ -83,9 +83,7 @@ internal class KeyStrokeConverter
 			}
 			else if (receivedKey.KeyChar == '\0') // handle control characters
 			{
-				StateMachine.ReturnToStart();
-				PreviousStates.Clear();
-				_cachedMatch = null;
+				Reset();
 			}
 			else if (Key.IsStop(receivedKey.KeyChar) 
 				&& _cachedMatch != null) // handle stop characters
@@ -115,6 +113,13 @@ internal class KeyStrokeConverter
 
 			PreviousStates.Push(StateMachine.CurrentState);
 		}
+	}
+
+	public void Reset()
+	{
+		StateMachine.ReturnToStart();
+		PreviousStates.Clear();
+		_cachedMatch = null;
 	}
 
 	private bool Process(Key receivedKey, out List<char> matchedString)
