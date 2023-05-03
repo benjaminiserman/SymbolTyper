@@ -1,5 +1,5 @@
 # SymbolTyper
-![Downloads](https://img.shields.io/github/downloads/winggar/SymbolTyper/total?style=for-the-badge)
+![Downloads](https://img.shields.io/github/downloads/benjaminiserman/SymbolTyper/total?style=for-the-badge)
 
 SymbolTyper is an app that allows the typing of complex symbols on a regular keyboard. 
 
@@ -37,4 +37,4 @@ Alternatively see the GitHub documentation on [creating a pull request](https://
 
 ## License
 
-![License](https://img.shields.io/github/license/winggar/SymbolTyper?style=for-the-badge)
+![License](https://img.shields.io/github/license/benjaminiserman/SymbolTyper?style=for-the-badge)
