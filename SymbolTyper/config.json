@@ -4,7 +4,6 @@
 	"Modifiers": 262144,
 	"Suspended": false
   },
-  "StringStartKey": 262144,
   "Replacements": {
 	// mathematical greek capitals
 	"\\Alpha": "𝛢",
